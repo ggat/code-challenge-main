@@ -6,6 +6,7 @@ import stores from "./stores";
 
 import "./App.css";
 import { IDocument } from "./types";
+import { ErrorBar } from "./components/ErrorBar";
 
 const App: React.FC = () => {
   const [editDoc, setEditDoc] = useState<IDocument | null>(null);
@@ -14,6 +15,7 @@ const App: React.FC = () => {
 
   return (
     <Provider {...stores}>
+      <ErrorBar />
       {editDoc ? (
         <DocumentEdit doc={editDoc} onLeave={handleLeaveEdit} />
       ) : (
