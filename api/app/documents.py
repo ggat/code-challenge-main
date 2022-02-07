@@ -101,3 +101,31 @@ def delete(document_id):
     db_session.commit()
 
     return jsonify({'message': 'OK'}), 200
+
+# TODO: this endpoint errors out, but unfortunately
+# but you get the idea
+@documents_mod.route('/<string:document_id>/sort', methods=['PATCH'])
+def sort(document_id):
+    document = PgDocument.query.get(document_id).first()
+    if not document:
+        abort(404, "resource not found")
+
+    request_data = request.get_json()
+    sort_after = request_data.get('sort_after')
+    if not sort_after:
+        abort(400, "sort_after paramter is required")
+
+    documentBefore = PgDocument.query.get(sort_after).first()
+
+    if not documentBefore: 
+        abort(404, "resource not found")
+
+    setattr(document, 'sort_weight', documentBefore.serialize().sort_weight+1)
+
+    db_session.add(document)
+    db_session.commit()
+
+    if 'deleted_at' in request_data and document.children:
+        _propagate_delete_status(document, request_data.get('deleted_at'))
+
+    return jsonify({'data': document.serialize()}), 200
