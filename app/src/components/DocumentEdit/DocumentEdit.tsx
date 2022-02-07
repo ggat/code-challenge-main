@@ -9,6 +9,7 @@ import {
   ToDocumentListButton
 } from "./styled";
 import { reportErrorToUI as reportErrors } from "../../utils";
+import { IDocument } from "../../types";
 
 interface IProps {
   documentStore: DocumentStore;
@@ -20,13 +21,19 @@ export const DocumentEdit: React.FC<IProps> = observer(
     const handleBackButtonClick = useCallback(() => onLeave?.(), [onLeave]);
     const { doc, update } = documentStore;
     const handleChange = useCallback(
-      value =>
-        reportErrors(() =>
-          update({
-            body: value()
-          })
-        ),
+      (changes: Partial<IDocument>) => reportErrors(() => update(changes)),
       [update]
+    );
+
+    const handleBodyChange = useCallback(
+      value => handleChange({ body: value() }),
+      [handleChange]
+    );
+
+    const handleTitleChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) =>
+        handleChange({ title: event.target.value }),
+      [handleChange]
     );
 
     return (
@@ -43,7 +50,16 @@ export const DocumentEdit: React.FC<IProps> = observer(
             <div>{doc.updated_at}</div>
           </StatusContainer>
         </Controls>
-        <Editor defaultValue={doc.body} onChange={handleChange} />
+        <input
+          type="text"
+          value={doc.title}
+          onChange={handleTitleChange}
+        ></input>
+        <Editor
+          data-test-id="document-body-input"
+          defaultValue={doc.body}
+          onChange={handleBodyChange}
+        />
       </Container>
     );
   }

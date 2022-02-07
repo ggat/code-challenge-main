@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect } from "react";
 import { IDocument } from "../../types";
-import { List, ListItem, ListItemPiece } from "./styled";
+import { List, ListItem, ListItemButton, ListItemPiece } from "./styled";
 import { observer } from "mobx-react";
 import useStores from "../../hooks/useStores";
 import { reportErrorToUI as reportError } from "../../utils";
 import { DocumentStore } from "../../stores";
 
 interface IProps {
-  onDocumentClicked?: (doc: DocumentStore) => void;
+  onDocumentEdit?: (doc: DocumentStore) => void;
 }
 
 export const DocumentList: React.FC<IProps> = observer(
-  ({ onDocumentClicked }) => {
+  ({ onDocumentEdit }) => {
     const { documentListStore, ui } = useStores();
     const {
       documentsStores: documents,
@@ -21,12 +21,12 @@ export const DocumentList: React.FC<IProps> = observer(
     } = documentListStore!;
 
     const getDocumentKey = useCallback((doc: IDocument) => doc.id, []);
-    const handleDocumentClick = useCallback(
-      (doc: DocumentStore) => () => onDocumentClicked?.(doc),
-      [onDocumentClicked]
+    const handleDocumentEditClick = useCallback(
+      (doc: DocumentStore) => () => onDocumentEdit?.(doc),
+      [onDocumentEdit]
     );
 
-    const handleDocumentDelete = useCallback((doc: IDocument) => () => deleteDocument(doc), [deleteDocument]);
+    const handleDocumentDeleteClick = useCallback((doc: IDocument) => () => deleteDocument(doc), [deleteDocument]);
 
     useEffect(() => {
       reportError(() => fetchDocuments());
@@ -45,10 +45,10 @@ export const DocumentList: React.FC<IProps> = observer(
         {documents.map((docStore) => (
           <ListItem
             key={getDocumentKey(docStore.doc)}
-            onClick={handleDocumentClick(docStore)}
           >
             <ListItemPiece>{docStore.doc.title}</ListItemPiece>
-            <ListItemPiece><button onClick={handleDocumentDelete(docStore.doc)}>Delete</button></ListItemPiece>
+            <ListItemPiece><ListItemButton onClick={handleDocumentEditClick(docStore)}>Edit</ListItemButton></ListItemPiece>
+            <ListItemPiece><ListItemButton onClick={handleDocumentDeleteClick(docStore.doc)}>Delete</ListItemButton></ListItemPiece>
           </ListItem>
         ))}
       </List>

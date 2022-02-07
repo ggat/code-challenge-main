@@ -56,6 +56,12 @@ export class DocumentStore {
   update = async (updates: Partial<IDocument>) => {
     runInAction(() => {
       this.isDirty = true;
+      // update local doc, make sure id is not overwritten
+      const {id, ...rest} = updates;
+      this.doc = {
+        ...this.doc,
+        ...rest
+      }
     });
     await this.updateRemote(updates);
   };

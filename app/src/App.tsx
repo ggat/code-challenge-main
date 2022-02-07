@@ -10,7 +10,7 @@ import { ErrorBar } from "./components/ErrorBar";
 const App: React.FC = () => {
   const [editDoc, setEditDoc] = useState<DocumentStore | null>(null);
   const handleLeaveEdit = useCallback(() => setEditDoc(null), []);
-  const handleDocumentClicked = useCallback((doc) => setEditDoc(doc), []);
+  const handleDocumentEdit = useCallback((doc) => setEditDoc(doc), []);
 
   return (
     <Provider {...stores}>
@@ -18,7 +18,7 @@ const App: React.FC = () => {
       {editDoc ? (
         <DocumentEdit documentStore={editDoc} onLeave={handleLeaveEdit} />
       ) : (
-        <DocumentList onDocumentClicked={handleDocumentClicked} />
+        <DocumentList onDocumentEdit={handleDocumentEdit} />
       )}
     </Provider>
   );

@@ -1,13 +1,18 @@
 import styled from "styled-components";
 
 export const List = styled.ul`
-    background-color: red;
 `
 
 export const ListItem = styled.li`
-    background-color: red;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    margin-bottom: 10px;
 `
 
 export const ListItemPiece = styled.div`
-    background-color: red;
+    margin-right: 6px;
+`
+
+export const ListItemButton = styled.button`
 `
