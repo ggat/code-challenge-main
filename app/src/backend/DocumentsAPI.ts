@@ -7,7 +7,7 @@ export const fetchDocuments = (): Promise<Array<IDocument>> =>
     .then(res => res.json())
     .then(({ data }) => data);
 
-export const createDocument = (doc: IDocument): Promise<IDocument> =>
+export const createDocument = (doc: Partial<Omit<IDocument, "id">>): Promise<IDocument> =>
   fetchJson("/v1/documents", { method: "POST", body: JSON.stringify(doc) })
     .then(assertResponseOk("Creation of a new document failed"))
     .then(res => res.json())

@@ -31,7 +31,7 @@ export default class DocumentListStore {
     );
   };
 
-  create = async (doc: IDocument) => {
+  create = async (doc: Partial<Omit<IDocument, "id">>) => {
     const remoteDoc = await createDocument(doc);
     runInAction(() => this.documentsStores.push(new DocumentStore(remoteDoc)));
   };

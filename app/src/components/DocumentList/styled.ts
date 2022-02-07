@@ -7,6 +7,10 @@ export const Container = styled.div`
     align-items: center;
 `
 
+export const ListHeader = styled.div`
+  width: 70%;
+`
+
 export const List = styled.ul`
   padding: 0;
   width: 70%;

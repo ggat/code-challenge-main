@@ -5,6 +5,7 @@ import {
   DeleteButton,
   EditButton,
   List,
+  ListHeader,
   ListItem,
   ListItemPiece
 } from "./styled";
@@ -12,6 +13,8 @@ import { observer } from "mobx-react";
 import useStores from "../../hooks/useStores";
 import { reportErrorToUI as reportError } from "../../utils";
 import { DocumentStore } from "../../stores";
+import { reportErrorToUI as reportErrors } from "../../utils";
+import { Button } from "../../styles/shared";
 
 interface IProps {
   onDocumentEdit?: (doc: DocumentStore) => void;
@@ -23,7 +26,8 @@ export const DocumentList: React.FC<IProps> = observer(({ onDocumentEdit }) => {
     documentsStores: documents,
     isFetching,
     load: fetchDocuments,
-    delete: deleteDocument
+    delete: deleteDocument,
+    create: createDocument
   } = documentListStore!;
 
   const getDocumentKey = useCallback((doc: IDocument) => doc.id, []);
@@ -33,8 +37,18 @@ export const DocumentList: React.FC<IProps> = observer(({ onDocumentEdit }) => {
   );
 
   const handleDocumentDeleteClick = useCallback(
-    (doc: IDocument) => () => deleteDocument(doc),
+    (doc: IDocument) => () => reportErrors(() => deleteDocument(doc)),
     [deleteDocument]
+  );
+
+  const handleDocumentCreateClick = useCallback(
+    () =>
+      reportErrors(() =>
+        createDocument({
+          title: "New Document"
+        })
+      ),
+    [createDocument]
   );
 
   useEffect(() => {
@@ -51,7 +65,10 @@ export const DocumentList: React.FC<IProps> = observer(({ onDocumentEdit }) => {
 
   return (
     <Container>
-      <h1>Hit edit to start editing a document</h1>
+      <ListHeader>
+        <h1>Hit edit to start editing a document</h1>
+        <Button onClick={handleDocumentCreateClick}>Create a new document</Button>
+      </ListHeader>
       <List>
         {documents.map(docStore => (
           <ListItem key={getDocumentKey(docStore.doc)}>
