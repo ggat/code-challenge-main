@@ -1,41 +1,62 @@
-import { makeObservable, observable, action } from "mobx";
-import { createDocument, deleteDocument, fetchDocuments } from "../backend";
+import { makeObservable, observable, action, runInAction } from "mobx";
+import { updateDocument } from "../backend";
 import { IDocument } from "../types";
-import RootStore from "./RootStore";
 
-export default class DocumentStore {
-  store: RootStore;
-  documents: IDocument[];
-  isFetching: boolean;
+function debounce(func: any, timeout = 1000) {
+  let timer: any;
+  return (...args: any) => {
+    clearTimeout(timer);
+    return new Promise((resolve, reject) => {
+      timer = setTimeout(async () => {
+        try {
+          resolve(await func(...args));
+        } catch (e) {
+          reject(e);
+        }
+      }, timeout);
+    });
+  };
+}
 
-  constructor(store: RootStore) {
+export class DocumentStore {
+  doc: IDocument;
+  isDirty: boolean;
+  isSaving: boolean;
+
+  constructor(doc: IDocument) {
     makeObservable(this, {
-      documents: observable,
-      load: action,
-      create: action,
-      delete: action
+      doc: observable,
+      isDirty: observable,
+      isSaving: observable,
+      update: action,
+      updateRemote: action
     });
-    this.documents = [];
-    this.store = store;
-    this.isFetching = false;
+
+    this.doc = doc;
+    this.isDirty = false;
+    this.isSaving = false;
   }
 
-  async load() {
-    await fetchDocuments().then(
-      remoteDocuments => (this.documents = remoteDocuments)
-    );
-  }
-
-  create(doc: IDocument) {
-    createDocument(doc).then(remoteDoc => {
-      this.documents.push(remoteDoc);
+  updateRemote = debounce(async (updates: Partial<IDocument>) => {
+    runInAction(() => {
+      this.isSaving = true;
     });
-  }
 
-  delete(doc: IDocument) {
-    deleteDocument(doc).then(() => {
-      const index = this.documents.findIndex(doc2 => doc2 === doc);
-      this.documents.splice(index, 1);
+    await updateDocument({
+      id: this.doc.id,
+      ...updates
     });
-  }
+
+    runInAction(() => {
+      this.isSaving = false;
+      this.isDirty = false;
+    });
+  });
+
+  update = async (updates: Partial<IDocument>) => {
+    runInAction(() => {
+      this.isDirty = true;
+    });
+    await this.updateRemote(updates);
+  };
 }

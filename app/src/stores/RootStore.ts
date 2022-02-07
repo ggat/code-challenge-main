@@ -1,18 +1,18 @@
-import DocumentStore from "./DocumentStore";
+import DocumentListStore from "./DocumentListStore";
 import UIStore from "./UIStore";
 
 export interface IRootStore {
   ui?: UIStore;
-  documentStore?: DocumentStore;
+  documentListStore?: DocumentListStore;
 }
 
 export default class RootStore implements IRootStore {
   ui: UIStore;
-  documentStore: DocumentStore;
+  documentListStore: DocumentListStore;
 
   constructor() {
     this.ui = new UIStore(this);
-    this.documentStore = new DocumentStore(this);
+    this.documentListStore = new DocumentListStore(this);
   }
 
   get stores() {

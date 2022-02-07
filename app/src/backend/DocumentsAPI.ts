@@ -13,8 +13,8 @@ export const createDocument = (doc: IDocument): Promise<IDocument> =>
     .then(res => res.json())
     .then(({ data }) => data);
 
-export const updateDocument = (doc: IDocument): Promise<IDocument> =>
-  fetchJson("/v1/documents", { method: "PATCH", body: JSON.stringify(doc) })
+export const updateDocument = (doc: Partial<IDocument>): Promise<IDocument> =>
+  fetchJson(`/v1/documents/${doc.id}`, { method: "PATCH", body: JSON.stringify(doc) })
     .then(assertResponseOk("Update of the document failed"))
     .then(res => res.json())
     .then(({ data }) => data);

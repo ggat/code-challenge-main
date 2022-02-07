@@ -4,26 +4,32 @@ import { List, ListItem, ListItemPiece } from "./styled";
 import { observer } from "mobx-react";
 import useStores from "../../hooks/useStores";
 import { reportErrorToUI as reportError } from "../../utils";
+import { DocumentStore } from "../../stores";
 
 interface IProps {
-  onDocumentClicked?: (doc: IDocument) => void;
+  onDocumentClicked?: (doc: DocumentStore) => void;
 }
 
 export const DocumentList: React.FC<IProps> = observer(
   ({ onDocumentClicked }) => {
-    const { documentStore, ui } = useStores();
-    const { documents, isFetching, load: fetchDocuments } = documentStore!;
+    const { documentListStore, ui } = useStores();
+    const {
+      documentsStores: documents,
+      isFetching,
+      load: fetchDocuments,
+      delete: deleteDocument,
+    } = documentListStore!;
 
     const getDocumentKey = useCallback((doc: IDocument) => doc.id, []);
     const handleDocumentClick = useCallback(
-      (doc: IDocument) => () => onDocumentClicked?.(doc),
+      (doc: DocumentStore) => () => onDocumentClicked?.(doc),
       [onDocumentClicked]
     );
 
+    const handleDocumentDelete = useCallback((doc: IDocument) => () => deleteDocument(doc), [deleteDocument]);
+
     useEffect(() => {
-      reportError(async () => {
-        await fetchDocuments();
-      });
+      reportError(() => fetchDocuments());
     }, [fetchDocuments, ui]);
 
     if (isFetching) {
@@ -36,12 +42,13 @@ export const DocumentList: React.FC<IProps> = observer(
 
     return (
       <List>
-        {documents.map((doc: IDocument) => (
+        {documents.map((docStore) => (
           <ListItem
-            key={getDocumentKey(doc)}
-            onClick={handleDocumentClick(doc)}
+            key={getDocumentKey(docStore.doc)}
+            onClick={handleDocumentClick(docStore)}
           >
-            <ListItemPiece>{doc.title}</ListItemPiece>
+            <ListItemPiece>{docStore.doc.title}</ListItemPiece>
+            <ListItemPiece><button onClick={handleDocumentDelete(docStore.doc)}>Delete</button></ListItemPiece>
           </ListItem>
         ))}
       </List>
