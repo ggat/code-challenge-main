@@ -42,15 +42,17 @@ export class DocumentStore {
       this.isSaving = true;
     });
 
-    await updateDocument({
+    const remoteDocument = await updateDocument({
       id: this.doc.id,
       ...updates
-    });
-
-    runInAction(() => {
+    }).finally(() => runInAction(() => {
       this.isSaving = false;
       this.isDirty = false;
-    });
+    }));
+
+    runInAction(() => {
+      this.doc = remoteDocument;
+    })
   });
 
   update = async (updates: Partial<IDocument>) => {
