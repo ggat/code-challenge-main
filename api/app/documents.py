@@ -102,11 +102,15 @@ def delete(document_id):
 
     return jsonify({'message': 'OK'}), 200
 
-# TODO: this endpoint errors out, but unfortunately
-# but you get the idea
+"""
+this endpoint is implemented so that reviewer can get the idea
+how I would implement manual sorting for UI. As such, this one has two issues:
+- it requires documents to always have different sort weights, which should be implemented on DB side, and which is not implemented yet
+- it has to fetch the document after which it should be placed to increment own sort_weight based on it, this should also be implemented on DB side
+"""
 @documents_mod.route('/<string:document_id>/sort', methods=['PATCH'])
 def sort(document_id):
-    document = PgDocument.query.get(document_id).first()
+    document = PgDocument.query.get(document_id)
     if not document:
         abort(404, "resource not found")
 
@@ -115,17 +119,14 @@ def sort(document_id):
     if not sort_after:
         abort(400, "sort_after paramter is required")
 
-    documentBefore = PgDocument.query.get(sort_after).first()
+    documentBefore = PgDocument.query.get(sort_after)
 
     if not documentBefore: 
         abort(404, "resource not found")
 
-    setattr(document, 'sort_weight', documentBefore.serialize().sort_weight+1)
+    setattr(document, 'sort_weight', document.sort_weight+1)
 
     db_session.add(document)
     db_session.commit()
-
-    if 'deleted_at' in request_data and document.children:
-        _propagate_delete_status(document, request_data.get('deleted_at'))
 
     return jsonify({'data': document.serialize()}), 200

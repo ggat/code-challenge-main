@@ -21,7 +21,7 @@ class PgDocument(SqlalchemyHelper.Base, PGNormModel):
     is_pinned = Column(Boolean, default=False)
     deleted_at = Column(DateTime, default=None, nullable=True)
     parent_id = Column(UUID(), ForeignKey('documents.id', ondelete="CASCADE"))
-    sort_weight = Column(Integer, default=0)
+    sort_weight = Column(Integer, default=0, nullable=False)
 
     def __repr__(self):
         return f'Document<id: {self.id}, title: {self.title}>'
