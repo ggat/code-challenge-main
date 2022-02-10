@@ -44,5 +44,8 @@
   "proxy": "http://localhost:3001",
   "jest": {
     "resetMocks": false
+  },
+  "devDependencies": {
+    "@types/styled-components": "^5.1.22"
   }
 }
