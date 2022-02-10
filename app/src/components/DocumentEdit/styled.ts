@@ -41,6 +41,7 @@ export const TitleInput = styled.input`
   font-size: 32px;
   padding: 0.5rem 0;
   margin-bottom: 16px;
+  width: 100%;
 `;
 
 export const EditorContainer = styled.div`
